@@ -2,8 +2,8 @@ import React from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Swiper from 'react-native-deck-swiper';
-import { getRecommendedUsers, likeUser, dislikeUser, User } from '../../services/api';
-import UserCard from '../../components/organisms/UserCard';
+import { getRecommendedUsers, likeUser, dislikeUser, User } from '../services/api';
+import UserCard from '../components/organisms/UserCard';
 
 const MainScreen = () => {
   const queryClient = useQueryClient();

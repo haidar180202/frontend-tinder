@@ -1,16 +1,29 @@
 import axios from 'axios';
+import { RegistrationData, LoginData, LoginResponse } from '../types/Auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Pastikan backend Anda berjalan di alamat ini
-const API_URL = 'http://localhost:8000/api';
+const API_URL = 'http://192.168.18.27:8000/api';
 
 const api = axios.create({
   baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
-    // Jika Anda sudah implementasi autentikasi, token bisa ditambahkan di sini
-    // 'Authorization': `Bearer ${your_token}`
   },
 });
+
+api.interceptors.request.use(
+  async (config) => {
+    const token = await AsyncStorage.getItem('userToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 export interface User {
   id: number;
@@ -33,6 +46,26 @@ export const getRecommendedUsers = async (): Promise<User[]> => {
     return response.data.data; // Laravel membungkus data dalam properti `data`
   } catch (error) {
     console.error('Failed to fetch recommended users:', error);
+    throw error;
+  }
+};
+
+export const registerUser = async (userData: RegistrationData) => {
+  try {
+    const response = await api.post('/register', userData);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to register user:', error);
+    throw error;
+  }
+};
+
+export const loginUser = async (userData: LoginData): Promise<LoginResponse> => {
+  try {
+    const response = await api.post('/login', userData);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to login user:', error);
     throw error;
   }
 };

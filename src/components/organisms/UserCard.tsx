@@ -1,7 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, ImageBackground } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 
-// Ini adalah tipe data sementara, kita akan sesuaikan dengan data dari API nanti
 interface UserCardProps {
   card: {
     id: number;
@@ -18,10 +18,14 @@ const UserCard: React.FC<UserCardProps> = ({ card }) => {
 
   return (
     <View style={styles.card}>
-      <Image source={{ uri: card.profile_picture }} style={styles.image} />
-      <View style={styles.textContainer}>
-        <Text style={styles.name}>{card.name}, {card.age}</Text>
-      </View>
+      <ImageBackground source={{ uri: card.profile_picture }} style={styles.image} imageStyle={{ borderRadius: 15 }}>
+        <LinearGradient
+          colors={['transparent', 'rgba(0,0,0,0.8)']}
+          style={styles.gradient}
+        >
+          <Text style={styles.name}>{card.name}, {card.age}</Text>
+        </LinearGradient>
+      </ImageBackground>
     </View>
   );
 };
@@ -34,29 +38,27 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 5,
     },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOpacity: 0.36,
+    shadowRadius: 6.68,
+    elevation: 11,
   },
   image: {
     width: '100%',
     height: '100%',
-    borderRadius: 15,
+    justifyContent: 'flex-end',
   },
-  textContainer: {
-    position: 'absolute',
-    bottom: 20,
-    left: 20,
+  gradient: {
+    width: '100%',
+    padding: 20,
+    borderBottomLeftRadius: 15,
+    borderBottomRightRadius: 15,
   },
   name: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 28,
     color: 'white',
-    textShadowColor: 'rgba(0, 0, 0, 0.75)',
-    textShadowOffset: { width: -1, height: 1 },
-    textShadowRadius: 10,
+    fontWeight: 'bold',
   },
 });
 
