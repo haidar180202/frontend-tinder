@@ -40,7 +40,7 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
   };
 
   return (
-    <LinearGradient colors={['#FF6B6B', '#FF8E53']} style={styles.container}>
+    <LinearGradient colors={['#FF006F', '#FF8E53']} style={styles.container}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}
@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
   loginButtonText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#FF6B6B',
+    color: '#FF006F',
   },
   registerText: {
     color: '#FFF',

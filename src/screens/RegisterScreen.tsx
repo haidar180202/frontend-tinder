@@ -39,7 +39,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
   };
 
   return (
-    <LinearGradient colors={['#FD297B', '#FF655B']} style={styles.container}>
+    <LinearGradient colors={['#FF006F', '#FF8E53']} style={styles.container}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
   registerButtonText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#FF655B',
+    color: '#FF006F',
   },
   loginText: {
     color: '#FFF',
