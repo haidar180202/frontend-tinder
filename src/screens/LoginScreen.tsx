@@ -4,6 +4,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { LinearGradient } from 'expo-linear-gradient';
 import { loginUser } from '../services/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import TinderLogo from '../assets/tinderlogo.svg';
 
 type RootStackParamList = {
   Login: undefined;
@@ -44,6 +45,7 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}
       >
+        <TinderLogo width={100} height={100} style={styles.logo} />
         <Text style={styles.title}>Welcome Back</Text>
         <Text style={styles.subtitle}>Sign in to continue</Text>
         <TextInput
@@ -83,6 +85,9 @@ const styles = StyleSheet.create({
   keyboardView: {
     width: '80%',
     alignItems: 'center',
+  },
+  logo: {
+    marginBottom: 20,
   },
   title: {
     fontSize: 32,

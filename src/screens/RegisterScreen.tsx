@@ -3,6 +3,7 @@ import { View, Text, TextInput, StyleSheet, Alert, TouchableOpacity, KeyboardAvo
 import { StackNavigationProp } from '@react-navigation/stack';
 import { LinearGradient } from 'expo-linear-gradient';
 import { registerUser } from '../services/api';
+import TinderLogo from '../assets/tinderlogo.svg';
 
 type RootStackParamList = {
   Login: undefined;
@@ -38,11 +39,12 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
   };
 
   return (
-    <LinearGradient colors={['#FF8E53', '#FF6B6B']} style={styles.container}>
+    <LinearGradient colors={['#FD297B', '#FF655B']} style={styles.container}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}
       >
+        <TinderLogo width={100} height={100} style={styles.logo} />
         <Text style={styles.title}>Create Account</Text>
         <Text style={styles.subtitle}>Join our community</Text>
         <TextInput
@@ -73,9 +75,6 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
         <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
           <Text style={styles.registerButtonText}>Register</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-          <Text style={styles.loginText}>Already have an account? <Text style={styles.loginLink}>Login</Text></Text>
-        </TouchableOpacity>
       </KeyboardAvoidingView>
     </LinearGradient>
   );
@@ -90,6 +89,9 @@ const styles = StyleSheet.create({
   keyboardView: {
     width: '80%',
     alignItems: 'center',
+  },
+  logo: {
+    marginBottom: 20,
   },
   title: {
     fontSize: 32,
@@ -123,7 +125,7 @@ const styles = StyleSheet.create({
   registerButtonText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#FF8E53',
+    color: '#FF655B',
   },
   loginText: {
     color: '#FFF',

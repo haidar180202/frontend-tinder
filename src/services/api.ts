@@ -25,6 +25,19 @@ api.interceptors.request.use(
   }
 );
 
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error.response && error.response.status === 401) {
+      await AsyncStorage.removeItem('userToken');
+      // Anda perlu mengimplementasikan NavigationService untuk menavigasi pengguna
+      // NavigationService.navigate('Login');
+      console.log('Unauthorized, logging out.');
+    }
+    return Promise.reject(error);
+  }
+);
+
 export interface User {
   id: number;
   name: string;
@@ -42,7 +55,8 @@ export interface User {
 
 export const getRecommendedUsers = async (): Promise<User[]> => {
   try {
-    const response = await api.get('/users/recommendations');
+    const response = await api.get('/users/recommended');
+    // console.error('API response:', response.data);
     return response.data.data; // Laravel membungkus data dalam properti `data`
   } catch (error) {
     console.error('Failed to fetch recommended users:', error);

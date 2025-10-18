@@ -8,6 +8,7 @@ import LoginScreen from './src/screens/LoginScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { View, ActivityIndicator } from 'react-native';
+import { navigationRef } from './src/services/NavigationService';
 
 const queryClient = new QueryClient();
 const Stack = createStackNavigator();
@@ -54,7 +55,7 @@ export default function App() {
   return (
     <RecoilRoot>
       <QueryClientProvider client={queryClient}>
-        <NavigationContainer>
+        <NavigationContainer ref={navigationRef}>
           <AppNavigator />
         </NavigationContainer>
       </QueryClientProvider>
