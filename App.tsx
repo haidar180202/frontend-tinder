@@ -44,8 +44,8 @@ const AppNavigator = () => {
 
   return (
     <Stack.Navigator initialRouteName={initialRoute}>
-      <Stack.Screen name="Register" component={RegisterScreen} />
-      <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen name="Register" component={RegisterScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
       <Stack.Screen name="Main" component={MainScreen} />
     </Stack.Navigator>
   );

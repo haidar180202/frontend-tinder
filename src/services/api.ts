@@ -1,9 +1,10 @@
 import axios from 'axios';
 import { RegistrationData, LoginData, LoginResponse } from '../types/Auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { navigationRef } from './NavigationService';
 
 // Pastikan backend Anda berjalan di alamat ini
-const API_URL = 'http://192.168.18.27:8000/api';
+import { API_URL } from '../config';
 
 const api = axios.create({
   baseURL: API_URL,
@@ -30,9 +31,9 @@ api.interceptors.response.use(
   async (error) => {
     if (error.response && error.response.status === 401) {
       await AsyncStorage.removeItem('userToken');
-      // Anda perlu mengimplementasikan NavigationService untuk menavigasi pengguna
-      // NavigationService.navigate('Login');
-      console.log('Unauthorized, logging out.');
+      if (navigationRef.current) {
+        navigationRef.current.navigate('Login' as never);
+      }
     }
     return Promise.reject(error);
   }

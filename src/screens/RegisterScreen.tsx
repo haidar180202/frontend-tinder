@@ -33,8 +33,9 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
       await registerUser({ name, email, password });
       Alert.alert('Success', 'Registration successful! Please login.');
       navigation.navigate('Login');
-    } catch (error) {
-      Alert.alert('Registration Failed', 'An error occurred during registration.');
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || 'An error occurred during registration.';
+      Alert.alert('Registration Failed', errorMessage);
     }
   };
 
