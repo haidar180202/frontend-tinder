@@ -1,145 +1,252 @@
-import React from 'react';
-import { View, Text, StyleSheet, ImageBackground, Pressable } from 'react-native';
+import React, { useRef } from 'react';
+import {
+  StyleSheet,
+  View,
+  Text,
+  Image,
+  Dimensions,
+  Animated,
+  PanResponder,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import Feather from 'react-native-vector-icons/Feather';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { API_URL } from '../../config';
-import PlaceholderImage from '../../assets/samplefoto.jpg';
 
-interface UserCardProps {
-  card: {
-    id: number;
-    name: string;
-    age?: number;
-    profile_picture?: string;
-  };
-  handleLike: () => void;
-  handleDislike: () => void;
+const { width, height } = Dimensions.get('window');
+const SWIPE_THRESHOLD = width * 0.25;
+
+export interface Profile {
+  name: string;
+  age: number;
+  location: string;
+  profile_picture_url?: string;
+  bio: string;
+  birth_date: string;
 }
 
-const UserCard: React.FC<UserCardProps> = ({ card, handleLike, handleDislike }) => {
-  if (!card) {
-    return null;
-  }
+interface UserCardProps {
+  profile: Profile;
+  onSwipeLeft: () => void;
+  onSwipeRight: () => void;
+}
 
-  const imageUrl = card.profile_picture && card.profile_picture.startsWith('http') ? card.profile_picture : card.profile_picture ? `${API_URL.replace('/api', '')}${card.profile_picture}` : '';
+const UserCard: React.FC<UserCardProps> = ({ profile, onSwipeLeft, onSwipeRight }) => {
+  const position = useRef(new Animated.ValueXY()).current;
 
-  const renderContent = () => (
-    <LinearGradient
-      colors={['transparent', 'rgba(0,0,0,0.2)', 'rgba(0,0,0,0.9)']}
-      style={styles.gradient}
-    >
-      <View style={styles.userInfo}>
-        <View>
-          <Text style={styles.name}>{card.name}<Text style={styles.age}>{card.age ? `, ${card.age}` : ''}</Text></Text>
-        </View>
-        <View style={styles.actions}>
-          <Pressable onPress={handleDislike} style={[styles.button, styles.dislikeButton]}>
-            <MaterialCommunityIcons name="close" size={28} color="#ff3b5f" />
-          </Pressable>
-          <Pressable onPress={handleLike} style={[styles.button, styles.likeButton]}>
-            <MaterialCommunityIcons name="heart" size={28} color="#4de6a3" />
-          </Pressable>
-          <Pressable style={styles.infoIcon}>
-            <Feather name="info" size={24} color="white" />
-          </Pressable>
-        </View>
-      </View>
-    </LinearGradient>
-  );
+  const rotate = position.x.interpolate({
+    inputRange: [-width / 2, 0, width / 2],
+    outputRange: ['-10deg', '0deg', '10deg'],
+    extrapolate: 'clamp',
+  });
+
+  const likeOpacity = position.x.interpolate({
+    inputRange: [-width / 2, 0, width / 2],
+    outputRange: [0, 0, 1],
+    extrapolate: 'clamp',
+  });
+
+  const nopeOpacity = position.x.interpolate({
+    inputRange: [-width / 2, 0, width / 2],
+    outputRange: [1, 0, 0],
+    extrapolate: 'clamp',
+  });
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onPanResponderMove: (_, gesture) => {
+        position.setValue({ x: gesture.dx, y: gesture.dy });
+      },
+      onPanResponderRelease: (_, gesture) => {
+        if (gesture.dx > SWIPE_THRESHOLD) {
+          swipeRight();
+        } else if (gesture.dx < -SWIPE_THRESHOLD) {
+          swipeLeft();
+        } else {
+          Animated.spring(position, {
+            toValue: { x: 0, y: 0 },
+            useNativeDriver: false,
+          }).start();
+        }
+      },
+    })
+  ).current;
+
+  const swipeRight = () => {
+    Animated.timing(position, {
+      toValue: { x: width + 100, y: 0 },
+      duration: 300,
+      useNativeDriver: false,
+    }).start(() => {
+      onSwipeRight();
+    });
+  };
+
+  const swipeLeft = () => {
+    Animated.timing(position, {
+      toValue: { x: -width - 100, y: 0 },
+      duration: 300,
+      useNativeDriver: false,
+    }).start(() => {
+      onSwipeLeft();
+    });
+  };
 
   return (
-    <View style={styles.card}>
-      {imageUrl ? (
-        <ImageBackground
-          source={{ uri: imageUrl }}
-          style={styles.image}
-          imageStyle={{ borderRadius: 20 }}
-        >
-          {renderContent()}
-        </ImageBackground>
-      ) : (
-        <ImageBackground
-          source={PlaceholderImage}
-          style={styles.image}
-          imageStyle={{ borderRadius: 20 }}
-        >
-          {renderContent()}
-        </ImageBackground>
-      )}
-    </View>
+    <Animated.View
+      {...panResponder.panHandlers}
+      style={[
+        styles.card,
+        {
+          transform: [
+            { translateX: position.x },
+            { translateY: position.y },
+            { rotate },
+          ],
+        },
+      ]}
+    >
+      <Image source={{ uri: profile.profile_picture_url || 'https://via.placeholder.com/500' }} style={styles.cardImage} />
+      <LinearGradient
+        colors={['rgba(0,0,0,0.8)', 'transparent']}
+        style={styles.gradientTop}
+      />
+      <LinearGradient
+        colors={['transparent', 'rgba(0,0,0,0.8)']}
+        style={styles.gradient}
+      />
+
+      <Animated.View style={[styles.likeLabel, { opacity: likeOpacity }]}>
+        <Text style={styles.likeLabelText}>LIKE</Text>
+      </Animated.View>
+
+      <Animated.View style={[styles.nopeLabel, { opacity: nopeOpacity }]}>
+        <Text style={styles.nopeLabelText}>NOPE</Text>
+      </Animated.View>
+
+      <View style={styles.cardInfo}>
+        <View style={styles.nameContainer}>
+          <Text style={styles.name}>{profile.name}</Text>
+          <Text style={styles.age}> {profile.age}</Text>
+        </View>
+        <View style={styles.locationContainer}>
+          <Ionicons name="location-sharp" size={16} color="#fff" />
+          <Text style={styles.distance}>{profile.location}</Text>
+        </View>
+      </View>
+    </Animated.View>
   );
 };
 
 const styles = StyleSheet.create({
   card: {
-    width: '100%',
-    height:'100%',
-    alignSelf: 'center',
-    marginTop:'-15%',
-    marginBottom:'-15%',
-    borderRadius: 20,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.08,
-    shadowRadius: 15,
+    width: width,
+    height: height * 0.75,
+    borderRadius: 10,
+    position: 'absolute',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
   },
-  image: {
-    width: 'auto',
-    height: '96%',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    // overflow: 'hidden',
+  cardImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 20,
   },
   gradient: {
-    width: '97%',
-    height:'auto',
-    paddingHorizontal: 20,
-    paddingBottom: 40,
-    paddingTop: 40,
-    // marginHorizontal:0,
-    paddingBlockEnd:50,
+    position: 'absolute',
+    bottom: -50,
+    left: '2%',
+    right: '2%',
+    width: '96%',
+    height: '30%',
+    borderRadius: 15,
+  },
+  gradientTop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: '90%',
+    borderRadius: 10,
+  },
+  likeLabel: {
+    position: 'absolute',
+    top: 50,
+    right: 30,
+    borderWidth: 4,
+    borderColor: '#4CAF50',
+    borderRadius: 10,
+    padding: 10,
+    transform: [{ rotate: '20deg' }],
+  },
+  likeLabelText: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#4CAF50',
+  },
+  nopeLabel: {
+    position: 'absolute',
+    top: 50,
+    left: 30,
+    borderWidth: 4,
+    borderColor: '#FF6B6B',
+    borderRadius: 10,
+    padding: 10,
+    transform: [{ rotate: '-20deg' }],
+  },
+  nopeLabelText: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#FF6B6B',
+  },
+  cardInfo: {
+    position: 'absolute',
+    bottom: 20,
+    left: 0,
+    right: 0,
+    padding: 20,
+    backgroundColor: 'rgba(0,0,0,0.4)',
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
   },
-  userInfo: {
-    // flexDirection: 'row',
-    justifyContent: 'space-between',
+  verifiedBadge: {
+    backgroundColor: '#4CAF50',
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 15,
+    alignSelf: 'flex-start',
+    marginBottom: 10,
+  },
+  verifiedText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  nameContainer: {
+    flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 5,
   },
   name: {
     fontSize: 32,
-    color: 'white',
     fontWeight: 'bold',
-    textShadowColor: 'rgba(0, 0, 0, 0.75)',
-    textShadowOffset: { width: -1, height: 1 },
-    textShadowRadius: 10,
+    color: '#fff',
   },
   age: {
-    fontSize: 26,
+    fontSize: 28,
+    color: '#fff',
     fontWeight: '300',
   },
-  actions: {
+  locationContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 15,
   },
-  button: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-  },
-  likeButton: {},
-  dislikeButton: {},
-  infoIcon: {
-    padding: 8,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+  distance: {
+    fontSize: 16,
+    color: '#fff',
+    marginLeft: 5,
   },
 });
 

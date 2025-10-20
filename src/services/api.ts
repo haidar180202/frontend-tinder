@@ -44,14 +44,13 @@ export interface User {
   name: string;
   email: string;
   profile: {
+    name: string;
+    bio: string;
+    location: string;
+    birth_date: string;
     age: number;
-    // Tambahkan properti lain dari profil jika ada
+    profile_picture_url?: string;
   };
-  pictures: {
-    id: number;
-    url: string;
-    sequence: number;
-  }[];
 }
 
 export const getRecommendedUsers = async (): Promise<User[]> => {
@@ -85,24 +84,131 @@ export const loginUser = async (userData: LoginData): Promise<LoginResponse> => 
   }
 };
 
-export const likeUser = async (userId: number): Promise<any> => {
+export const userAction = async (userId: number, action: 'like' | 'dislike') => {
   try {
-    const response = await api.post(`/users/${userId}/like`);
+    const response = await api.get(`/users/${userId}/action?action=${action}`);
     return response.data;
   } catch (error) {
-    console.error(`Failed to like user ${userId}:`, error);
+    console.error(`Failed to ${action} user ${userId}:`, error);
+    throw error;
+  }
+}
+
+export const getMyDataByCategory = async (category: 'liked' | 'disliked' | 'liked_me'): Promise<User[]> => {
+  try {
+    const response = await api.get('/users/mycategories', {
+      headers: {
+        name: category,
+      },
+    });
+    return response.data.data;
+  } catch (error) {
+    console.error(`Failed to fetch users for category ${category}:`, error);
     throw error;
   }
 };
 
-export const dislikeUser = async (userId: number): Promise<any> => {
+export const getProfile = async () => {
   try {
-    const response = await api.post(`/users/${userId}/dislike`);
+    const token = await AsyncStorage.getItem('userToken');
+    const response = await api.get('/profile', {
+      headers: { Authorization: `Bearer ${token}` },
+    });
     return response.data;
-  } catch (error) {
-    console.error(`Failed to dislike user ${userId}:`, error);
-    throw error;
+  } catch (error: any) {
+    if (error.response && error.response.status === 404) {
+      return null; // Return null if profile is not found
+    }
+    throw error; // Re-throw other errors
   }
 };
+
+export const updateProfile = async (data: { name: string; bio: string; location: string; birth_date: string; picture?: string }) => {
+  const token = await AsyncStorage.getItem('userToken');
+  const formData = new FormData();
+
+  Object.keys(data).forEach(key => {
+    const value = data[key as keyof typeof data];
+    if (key === 'picture' && value) {
+      formData.append('picture', {
+        uri: value,
+        name: `photo.jpg`,
+        type: `image/jpeg`,
+      } as any);
+    } else if (value !== undefined) {
+      formData.append(key, value as string);
+    }
+  });
+
+  const response = await api.post('/profile', formData, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return response.data;
+};
+
+export const uploadAdditionalPicture = async (pictureUri: string) => {
+  const token = await AsyncStorage.getItem('userToken');
+  const formData = new FormData();
+
+  formData.append('picture', {
+    uri: pictureUri,
+    name: `photo.jpg`,
+    type: `image/jpeg`,
+  } as any);
+
+  const response = await api.post('/pictures', formData, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+
+  return response.data;
+};
+
+export const deletePicture = async (pictureId: number) => {
+  const token = await AsyncStorage.getItem('userToken');
+  const response = await api.delete(`/pictures/${pictureId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
+export const getMatches = async () => {
+  const token = await AsyncStorage.getItem('userToken');
+  const response = await api.get('/matches', {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
+export const getChats = async () => {
+  const token = await AsyncStorage.getItem('userToken');
+  const response = await api.get('/chats', {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
+export const getMessages = async (chatId: number) => {
+  const token = await AsyncStorage.getItem('userToken');
+  const response = await api.get(`/chats/${chatId}/messages`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
+export const sendMessage = async (chatId: number, content: string) => {
+  const token = await AsyncStorage.getItem('userToken');
+  const response = await api.post(`/chats/${chatId}/messages`, { content }, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
+
 
 export default api;

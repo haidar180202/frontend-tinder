@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, Alert, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import { View, Text, TextInput, StyleSheet, Alert, TouchableOpacity, Platform, ScrollView, Keyboard, Animated, Dimensions } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { LinearGradient } from 'expo-linear-gradient';
 import { registerUser } from '../services/api';
@@ -9,6 +9,9 @@ type RootStackParamList = {
   Login: undefined;
   Register: undefined;
 };
+
+const { height } = Dimensions.get('window');
+const shiftValue = height * 0.05;
 
 type RegisterScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -23,6 +26,35 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const shift = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        Animated.timing(shift, {
+          toValue: -shiftValue,
+          duration: 200,
+          useNativeDriver: true,
+        }).start();
+      }
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        Animated.timing(shift, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: true,
+        }).start();
+      }
+    );
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, [shift]);
 
   const handleRegister = async () => {
     if (!name || !email || !password) {
@@ -41,42 +73,49 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
 
   return (
     <LinearGradient colors={['#FF006F', '#FF8E53']} style={styles.container}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardView}
-      >
-        <TinderLogo width={100} height={100} style={styles.logo} />
-        <Text style={styles.title}>Create Account</Text>
-        <Text style={styles.subtitle}>Join our community</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Name"
-          placeholderTextColor="#FFF"
-          value={name}
-          onChangeText={setName}
-          autoCapitalize="words"
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          placeholderTextColor="#FFF"
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          placeholderTextColor="#FFF"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
-        <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
-          <Text style={styles.registerButtonText}>Register</Text>
-        </TouchableOpacity>
-      </KeyboardAvoidingView>
+      <Animated.View style={[styles.keyboardView, { transform: [{ translateY: shift }] }]}>
+        <ScrollView 
+          contentContainerStyle={styles.scrollViewContent}
+          keyboardShouldPersistTaps="handled"
+        >
+          <TinderLogo width={100} height={100} style={styles.logo} />
+          <Text style={styles.title}>Create Account</Text>
+          <Text style={styles.subtitle}>Join our community</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Name"
+            placeholderTextColor="#FFF"
+            value={name}
+            onChangeText={setName}
+            autoCapitalize="words"
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            placeholderTextColor="#FFF"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            placeholderTextColor="#FFF"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+          />
+          <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
+            <Text style={styles.registerButtonText}>Register</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+            <Text style={styles.loginText}>
+              Already have an account? <Text style={styles.loginLink}>Login</Text>
+            </Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </Animated.View>
     </LinearGradient>
   );
 };
@@ -88,8 +127,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   keyboardView: {
+    flex: 1,
     width: '80%',
+    justifyContent: 'center',
+  },
+  scrollViewContent: {
     alignItems: 'center',
+    flexGrow: 1,
+    justifyContent: 'center',
   },
   logo: {
     marginBottom: 20,
