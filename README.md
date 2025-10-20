@@ -78,3 +78,62 @@ Replace `http://your-backend-api-url/api` with the actual URL of your backend AP
 - **axios**: HTTP client
 - **expo**: React Native framework
 - **react-native-dotenv**: Loading environment variables from `.env`
+
+---
+
+## UI Screenshots
+
+Below are some examples of the application's user interface.
+
+<table>
+  <tr>
+    <td align="center"><strong>Splash Screen</strong></td>
+    <td align="center"><strong>Register Details</strong></td>
+    <td align="center"><strong>Login Details</strong></td>
+    <td align="center"><strong>Swipe Screen</strong></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="./assets/documentations/image1.jpeg" width="150"></td>
+    <td align="center"><img src="./assets/documentations/image13.jpeg" width="150"></td>
+    <td align="center"><img src="./assets/documentations/image14.jpeg" width="150"></td>
+    <td align="center"><img src="./assets/documentations/image2.jpeg" width="150"></td>
+  </tr>
+  <tr>
+    <td align="center"><strong>Swipe Dislike</strong></td>
+    <td align="center"><strong>Swipe Like</strong></td>
+    <td align="center"><strong>Explore Page Recomendation</strong></td>
+    <td align="center"><strong>Explore Page Liked</strong></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="./assets/documentations/image3.jpeg" width="150"></td>
+    <td align="center"><img src="./assets/documentations/image4.jpeg" width="150"></td>
+    <td align="center"><img src="./assets/documentations/image5.jpeg" width="150"></td>
+    <td align="center"><img src="./assets/documentations/image6.jpeg" width="150"></td>
+  </tr>
+  <tr>
+    <td align="center"><strong>Explore Page Dislike</strong></td>
+    <td align="center"><strong>Explore Page Like You</strong></td>
+    <td align="center"><strong>Profile Details</strong></td>
+    <td align="center"><strong>Profile Details</strong></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="./assets/documentations/image7.jpeg" width="150"></td>
+    <td align="center"><img src="./assets/documentations/image8.jpeg" width="150"></td>
+    <td align="center"><img src="./assets/documentations/image9.jpeg" width="150"></td>
+    <td align="center"><img src="./assets/documentations/image10.jpeg" width="150"></td>
+  </tr>
+  <tr>
+    <td align="center"><strong>Profile Edit Page</strong></td>
+    <td align="center"><strong>Profile Edit Page</strong></td>
+    <td align="center">&nbsp;</td>
+    <td align="center">&nbsp;</td>
+  </tr>
+  <tr>
+    <td align="center"><img src="./assets/documentations/image11.jpeg" width="150"></td>
+    <td align="center"><img src="./assets/documentations/image12.jpeg" width="150"></td>
+    <td align="center">&nbsp;</td>
+    <td align="center">&nbsp;</td>
+  </tr>
+
+
+</table>

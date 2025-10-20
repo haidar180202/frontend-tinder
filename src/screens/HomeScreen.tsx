@@ -71,7 +71,7 @@ export default function HomeScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.endContainer}>
-          <Text style={styles.endText}>Gagal memuat profil.</Text>
+          <Text style={styles.headerTitle}>Gagal memuat profil.</Text>
         </View>
       </SafeAreaView>
     );
@@ -82,7 +82,7 @@ export default function HomeScreen() {
       <SafeAreaView style={styles.container}>
         <StatusBar barStyle="dark-content" />
         <View style={styles.endContainer}>
-          <Text style={styles.endText}>Tidak ada profil lagi</Text>
+          <Text style={styles.headerTitle}>Tidak ada profil lagi</Text>
           <TouchableOpacity
             style={styles.resetButton}
             onPress={() => setCurrentIndex(0)} // Sebaiknya refetch data di sini
@@ -100,11 +100,8 @@ export default function HomeScreen() {
 
       {/* Header */}
       <View style={styles.header}>
-        <Ionicons name="arrow-back" size={28} color="#333" />
-        <Image
-          source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/7/74/Tinder_app_logo.png' }}
-          style={styles.logo}
-        />
+        <View style={{ width: 28 }} />
+        <Text style={styles.headerTitle}>Tinder</Text>
         <View style={styles.headerRight}>
           <Ionicons name="notifications" size={24} color="#333" style={styles.headerIcon} />
           <Ionicons name="wifi" size={24} color="#333" />
@@ -175,10 +172,12 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#f0f0f0',
   },
-  logo: {
-    width: 100,
-    height: 30,
-    resizeMode: 'contain',
+  headerTitle: {
+    flex: 1,
+    textAlign: 'center',
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
   },
   headerRight: {
     flexDirection: 'row',
@@ -246,12 +245,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  endText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 20,
   },
   resetButton: {
     backgroundColor: '#FF6B6B',
